@@ -1,6 +1,6 @@
 name: otel_cronofy
 description: Dartastic OpenTelemetry bridge for Cronofy (calendar abstraction, availability, scheduling, real-time scheduler, conferencing).
-version: 0.1.0-beta.1-wip
+version: 0.1.0-beta.1
 repository: https://github.com/dartastic/otel_cronofy
 homepage: https://dartastic.io
 publish_to: https://pub.dartastic.io
