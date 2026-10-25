@@ -1,15 +1,16 @@
-// Licensed under the Dartastic Pro Software License Agreement.
+// Licensed under the Apache License, Version 2.0
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
-import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
+import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_cronofy_suppression.dart';
 
 const _tracerName = 'dartastic_otel_libs_cronofy';
 
-Tracer _tracer() => OTel.tracerProvider().getTracer(_tracerName);
+APITracer _tracer() => OTelAPI.tracerProvider().getTracer(_tracerName);
 
 class CronofyResult {
+  /// Creates a result.
   const CronofyResult({
     this.itemCount,
     this.provider,
@@ -55,8 +56,13 @@ class CronofyResult {
   final int? statusCode;
 }
 
+/// What a traced call returned: the value for the caller plus fields
+/// recorded on the span.
 class CronofyCallResult<T> {
+  /// Creates a call result.
   const CronofyCallResult({required this.value, this.result});
+
+  /// The value returned to the caller.
   final T value;
   final CronofyResult? result;
 }
@@ -86,68 +92,68 @@ Future<T> tracedCronofy<T>({
   final span = _tracer().startSpan(
     'cronofy $operation',
     kind: SpanKind.client,
-    attributes: OTel.attributesFromMap(m),
+    attributes: OTelAPI.attributesFromMap(m),
   );
   try {
     final r = await invoke();
     if (r.result != null) {
       final extras = <Attribute<Object>>[];
       if (r.result!.itemCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'cronofy.item_count',
           r.result!.itemCount!,
         ));
       }
       if (r.result!.provider != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'cronofy.provider',
           r.result!.provider!,
         ));
       }
       if (r.result!.subCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'cronofy.sub_count',
           r.result!.subCount!,
         ));
       }
       if (r.result!.slotsReturned != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'cronofy.availability.slots',
           r.result!.slotsReturned!,
         ));
       }
       if (r.result!.queryPeriodsCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'cronofy.query_periods_count',
           r.result!.queryPeriodsCount!,
         ));
       }
       if (r.result!.smartInviteId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'cronofy.smart_invite.id',
           r.result!.smartInviteId!,
         ));
       }
       if (r.result!.realTimeSchedulingUrl != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'cronofy.real_time_scheduling.url.present',
           true,
         ));
       }
       if (r.result!.usedPageToken != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'cronofy.page_token.used',
           r.result!.usedPageToken!,
         ));
       }
       if (r.result!.requestId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'cronofy.request.id',
           r.result!.requestId!,
         ));
       }
       if (r.result!.statusCode != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'http.response.status_code',
           r.result!.statusCode!,
         ));
@@ -158,13 +164,13 @@ Future<T> tracedCronofy<T>({
           );
         }
       }
-      if (extras.isNotEmpty) span.addAttributes(OTel.attributes(extras));
+      if (extras.isNotEmpty) span.addAttributes(OTelAPI.attributes(extras));
     }
     return r.value;
   } catch (e, st) {
-    span.addAttributes(OTel.attributes([
-      OTel.attributeString(
-        ErrorResource.errorType.key,
+    span.addAttributes(OTelAPI.attributes([
+      OTelAPI.attributeString(
+        ErrorAttributes.errorType.key,
         e.runtimeType.toString(),
       ),
     ]));
